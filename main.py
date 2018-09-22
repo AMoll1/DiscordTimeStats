@@ -10,7 +10,7 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    await client.change_presence(game=discord.Game(name="Stalking {} users//nlb.help".
+    await client.change_presence(game=discord.Game(name="nlb.help//Stalking {} users".
                                                    format(len(tuple(client.get_all_members())))))
     # if online or in-game from beginning
     for member in client.get_all_members():
