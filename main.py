@@ -1,9 +1,8 @@
 import datetime
 import collections
 import discord
-from discord.ext import commands
+import os
 
-TOKEN = "NDkxMzMzOTgxMTcwNTY1MTIy.DobNJw.K5UQweaxo1iCBdFbQ17rSCrqhBw"
 ranks = collections.defaultdict(dict)
 start_time = collections.defaultdict(dict)
 
@@ -113,4 +112,4 @@ async def on_message(message):
                     i += 1
 
 
-client.run(TOKEN)
+client.run(os.getenv("TOKEN"))
