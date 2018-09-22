@@ -1,6 +1,6 @@
-import datetime
-import collections
 import discord
+import collections
+import datetime
 import os
 
 ranks = collections.defaultdict(dict)
@@ -74,9 +74,9 @@ async def on_message(message):
     msg = tuple(message.content.split())
     if "nlb.help" in msg and len(msg) == 1:
         await client.send_message(message.channel, "command:\t'rank [amount=5]'")
-    elif "rank" in msg and len(msg) <= 2:
+    elif "rank" in msg[0] and len(msg) <= 2:
         amount = 5
-        if len(msg) == 2 and msg[1].isdigit():
+        if msg[1].isdigit():
             amount = int(msg[1])
         # save times from current status
         for member in start_time.items():
