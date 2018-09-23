@@ -118,12 +118,12 @@ async def on_message(message):
                         # print embed
                         if i % 10 == 0:
                             embed = discord.Embed(title="TOP {}".format(amount), description=out,
-                                                  color=discord.Colour.red())
+                                                  color=discord.Colour.blue())
                             await client.send_message(message.channel, embed=embed)
                             out = str()
                         i += 1
                 if out:
-                    embed = discord.Embed(title="TOP {}".format(amount), description=out, color=discord.Colour.red())
+                    embed = discord.Embed(title="TOP {}".format(amount), description=out, color=discord.Colour.blue())
                     await client.send_message(message.channel, embed=embed)
             # if cmd self
             elif "self" in msg:
@@ -140,7 +140,7 @@ async def on_message(message):
                                                         str(seconds).zfill(2), status))
                 # print embed
                 embed = discord.Embed(title="{}".format(message.author.display_name), description=out,
-                                      color=discord.Colour.red())
+                                      color=discord.Colour.blue())
                 await client.send_message(message.channel, embed=embed)
 
 
