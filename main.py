@@ -74,7 +74,6 @@ async def on_member_update(before, after):
 async def on_message(message):
     if message.content.startswith("ts."):
         msg = message.content.replace("ts.", "", 1)
-        print(msg)
         if len(msg.split()) == 1:
             # save times from current status
             for member in start.items():
