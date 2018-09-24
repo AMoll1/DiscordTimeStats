@@ -24,8 +24,6 @@ async def on_ready():
 
 @client.event
 async def on_member_update(before, after):
-    await client.change_presence(game=discord.Game(name="ts.help//Stalking {} users".
-                                                   format(len(tuple(client.get_all_members())))))
     if not after.bot:
         # if status changed
         if before.status != after.status:
@@ -118,18 +116,20 @@ async def on_message(message):
                                                                     str(seconds).zfill(2), status))
                         # print embed
                         if i % 10 == 0:
-                            embed = discord.Embed(title="TOP {}".format(amount), description=out,
+                            embed = discord.Embed(title="TOP {}".format(amount), description=out[:2040],
                                                   color=discord.Colour.red())
                             await client.send_message(message.channel, embed=embed)
                             out = str()
                         i += 1
                 if out:
-                    embed = discord.Embed(title="TOP {}".format(amount), description=out, color=discord.Colour.red())
+                    embed = discord.Embed(title="TOP {}".format(amount), description=out[:2040],
+                                          color=discord.Colour.red())
                     await client.send_message(message.channel, embed=embed)
             # if cmd self
             elif "self" in msg:
                 # get embed
-                for status, time in sorted(ranks.get(message.author.id).items(), key=lambda x: x[1], reverse=True):
+                for j, (status, time) in enumerate(sorted(ranks.get(message.author.id).items(),
+                                                          key=lambda x: x[1], reverse=True), 1):
                     hours = 0
                     minutes = 0
                     seconds = time
@@ -139,8 +139,10 @@ async def on_message(message):
                         hours, minutes = divmod(minutes, 60)
                     out += ("\n{}:{}:{}\t**{}**".format(str(hours).zfill(2), str(minutes).zfill(2),
                                                         str(seconds).zfill(2), status))
+                    if j == 50:
+                        break
                 # print embed
-                embed = discord.Embed(title="{}".format(message.author.display_name), description=out,
+                embed = discord.Embed(title="{}".format(message.author.display_name), description=out[:2040],
                                       color=discord.Colour.red())
                 await client.send_message(message.channel, embed=embed)
 
