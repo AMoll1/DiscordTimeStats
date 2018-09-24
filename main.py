@@ -24,6 +24,8 @@ async def on_ready():
 
 @client.event
 async def on_member_update(before, after):
+    await client.change_presence(game=discord.Game(name="ts.help//Stalking {} users".
+                                                   format(len(tuple(client.get_all_members())))))
     if not after.bot:
         # if status changed
         if before.status != after.status:
