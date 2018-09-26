@@ -24,8 +24,6 @@ async def on_ready():
 
 @client.event
 async def on_member_update(before, after):
-    await client.change_presence(game=discord.Game(name="ts.help//Stalking {} users".
-                                                   format(len(tuple(client.get_all_members())))))
     if not after.bot:
         # if status changed
         if before.status != after.status:
@@ -75,110 +73,110 @@ async def on_member_update(before, after):
 async def on_message(message):
     if message.content.startswith("ts."):
         msg = message.content.replace("ts.", "", 1)
+        await client.change_presence(game=discord.Game(name="ts.help//Stalking {} users".
+                                                       format(len(tuple(client.get_all_members())))))
+        # save times from current status
+        for user_id, user_stats in start.items():
+            if message.server.get_member(user_id):
+                for status, time in user_stats.items():
+                    if time != 0:
+                        end_time = datetime.now()
+                        total_time = end_time - start[user_id].get(status, 0)
+                        times[user_id][status] = times[user_id].get(status, 0) + int(total_time.total_seconds())
+                        start[user_id][status] = datetime.now()
         out = str()
 
-        if len(msg.split()) == 1:
-            # save times from current status
-            for user_id, user_stats in start.items():
-                if message.server.get_member(user_id):
-                    for status, time in user_stats.items():
-                        if time != 0:
-                            end_time = datetime.now()
-                            total_time = end_time - start[user_id].get(status, 0)
-                            times[user_id][status] = times[user_id].get(status, 0) + int(total_time.total_seconds())
-                            start[user_id][status] = datetime.now()
+        # if cmd help
+        if "help" in msg and len(msg) == 4:
+            out = ("command:\t'ts.top'" + "\t" * 5 + "  - gets time stats of top 5 members\n" +
+                   "\t" * 6 + "'ts.top[amount]'" + "\t- gets time stats of top amount members\n" +
+                   "\t" * 6 + "'ts.self' " + "\t" * 5 + " - gets own time stats\n" +
+                   "\t" * 6 + "'ts.username' " + "\t" * 2 + " - gets time stats of specific member")
+            await client.send_message(message.channel, out)
 
-            # if cmd help
-            if "help" in msg and len(msg) == 4:
-                out = ("command:\t'ts.top'" + "\t" * 5 + "  - gets time stats of top 5 members\n" +
-                       "\t" * 6 + "'ts.top[amount]'" + "\t- gets time stats of top amount members\n" +
-                       "\t" * 6 + "'ts.self' " + "\t" * 5 + " - gets own time stats\n" +
-                       "\t" * 6 + "'ts.username' " + "\t" * 2 + " - gets time stats of specific member")
-                await client.send_message(message.channel, out)
-
-            # if cmd top
-            elif "top" in msg:
-                # get amount
-                msg = msg.replace("top", "", 1)
-                if msg.isdigit() or not msg:
-                    if msg.isdigit():
-                        amount = int(msg)
-                    else:
-                        amount = 5
-                    # get embed
-                    i = 1
-                    for user_id, user_stats in sorted(times.items(), key=lambda x: x[1].get("Online", 0), reverse=True):
-                        # for member on this server
-                        if message.server.get_member(user_id) and i <= amount:
-                            out += "\n\n**{}.\t{}**\n".format(i, message.server.get_member(user_id).display_name)
-                            for j, (status, time) in enumerate(sorted(user_stats.items(), key=lambda x: x[1],
-                                                                      reverse=True), 1):
-                                hours = 0
-                                minutes = 0
-                                seconds = time
-                                if seconds >= 60:
-                                    minutes, seconds = divmod(seconds, 60)
-                                if minutes >= 60:
-                                    hours, minutes = divmod(minutes, 60)
-                                out += ("\n{}:{}:{}\t**{}**".format(str(hours).zfill(2), str(minutes).zfill(2),
-                                                                    str(seconds).zfill(2), status))
-                                if j == 5:
-                                    break
-                            # print embed
-                            if i % 10 == 0:
-                                embed = discord.Embed(title="TOP {}".format(amount), description=out[:2040],
-                                                      color=discord.Colour.red())
-                                await client.send_message(message.channel, embed=embed)
-                                out = str()
-                            i += 1
-                    # print remaining embed
-                    if out:
-                        embed = discord.Embed(title="TOP {}".format(amount), description=out[:2040],
-                                              color=discord.Colour.red())
-                        await client.send_message(message.channel, embed=embed)
-
-            # if cmd self
-            elif "self" in msg and len(msg) == 4:
+        # if cmd top
+        elif "top" in msg:
+            # get amount
+            msg = msg.replace("top", "", 1)
+            if msg.isdigit() or not msg:
+                if msg.isdigit():
+                    amount = int(msg)
+                else:
+                    amount = 5
                 # get embed
-                for i, (status, time) in enumerate(sorted(times.get(message.author.id).items(),
-                                                          key=lambda x: x[1], reverse=True), 1):
-                    hours = 0
-                    minutes = 0
-                    seconds = time
-                    if seconds >= 60:
-                        minutes, seconds = divmod(seconds, 60)
-                    if minutes >= 60:
-                        hours, minutes = divmod(minutes, 60)
-                    out += ("\n{}:{}:{}\t**{}**".format(str(hours).zfill(2), str(minutes).zfill(2),
-                                                        str(seconds).zfill(2), status))
-                    if i == 50:
-                        break
-                # print embed
-                embed = discord.Embed(title="{}".format(message.author.display_name), description=out[:2040],
-                                      color=discord.Colour.red())
-                await client.send_message(message.channel, embed=embed)
+                i = 1
+                for user_id, user_stats in sorted(times.items(), key=lambda x: x[1].get("Online", 0), reverse=True):
+                    # for member on this server
+                    if message.server.get_member(user_id) and i <= amount:
+                        out += "\n\n**{}.\t{}**\n".format(i, message.server.get_member(user_id).display_name)
+                        for j, (status, time) in enumerate(sorted(user_stats.items(), key=lambda x: x[1],
+                                                                  reverse=True), 1):
+                            hours = 0
+                            minutes = 0
+                            seconds = time
+                            if seconds >= 60:
+                                minutes, seconds = divmod(seconds, 60)
+                            if minutes >= 60:
+                                hours, minutes = divmod(minutes, 60)
+                            out += ("\n{}:{}:{}\t**{}**".format(str(hours).zfill(2), str(minutes).zfill(2),
+                                                                str(seconds).zfill(2), status))
+                            if j == 5:
+                                break
+                        # print embed
+                        if i % 10 == 0:
+                            embed = discord.Embed(title="TOP {}".format(amount), description=out[:2040],
+                                                  color=discord.Colour.red())
+                            await client.send_message(message.channel, embed=embed)
+                            out = str()
+                        i += 1
+                # print remaining embed
+                if out:
+                    embed = discord.Embed(title="TOP {}".format(amount), description=out[:2040],
+                                          color=discord.Colour.red())
+                    await client.send_message(message.channel, embed=embed)
 
-            # if cmd user
-            elif message.server.get_member_named(msg):
-                user_id = message.server.get_member_named(msg).id
-                # get embed
-                for i, (status, time) in enumerate(sorted(times.get(user_id).items(), key=lambda x: x[1],
-                                                          reverse=True), 1):
-                    hours = 0
-                    minutes = 0
-                    seconds = time
-                    if seconds >= 60:
-                        minutes, seconds = divmod(seconds, 60)
-                    if minutes >= 60:
-                        hours, minutes = divmod(minutes, 60)
-                    out += ("\n{}:{}:{}\t**{}**".format(str(hours).zfill(2), str(minutes).zfill(2),
-                                                        str(seconds).zfill(2), status))
-                    if i == 50:
-                        break
-                # print embed
-                embed = discord.Embed(title="{}".format(message.server.get_member(user_id).display_name),
-                                      description=out[:2040], color=discord.Colour.red())
-                await client.send_message(message.channel, embed=embed)
+        # if cmd self
+        elif "self" in msg and len(msg) == 4:
+            # get embed
+            for i, (status, time) in enumerate(sorted(times.get(message.author.id).items(),
+                                                      key=lambda x: x[1], reverse=True), 1):
+                hours = 0
+                minutes = 0
+                seconds = time
+                if seconds >= 60:
+                    minutes, seconds = divmod(seconds, 60)
+                if minutes >= 60:
+                    hours, minutes = divmod(minutes, 60)
+                out += ("\n{}:{}:{}\t**{}**".format(str(hours).zfill(2), str(minutes).zfill(2),
+                                                    str(seconds).zfill(2), status))
+                if i == 50:
+                    break
+            # print embed
+            embed = discord.Embed(title="{}".format(message.author.display_name), description=out[:2040],
+                                  color=discord.Colour.red())
+            await client.send_message(message.channel, embed=embed)
+
+        # if cmd user
+        elif message.server.get_member_named(msg):
+            user_id = message.server.get_member_named(msg).id
+            # get embed
+            for i, (status, time) in enumerate(sorted(times.get(user_id).items(), key=lambda x: x[1],
+                                                      reverse=True), 1):
+                hours = 0
+                minutes = 0
+                seconds = time
+                if seconds >= 60:
+                    minutes, seconds = divmod(seconds, 60)
+                if minutes >= 60:
+                    hours, minutes = divmod(minutes, 60)
+                out += ("\n{}:{}:{}\t**{}**".format(str(hours).zfill(2), str(minutes).zfill(2),
+                                                    str(seconds).zfill(2), status))
+                if i == 50:
+                    break
+            # print embed
+            embed = discord.Embed(title="{}".format(message.server.get_member(user_id).display_name),
+                                  description=out[:2040], color=discord.Colour.red())
+            await client.send_message(message.channel, embed=embed)
 
 
 client.run(os.getenv("TOKEN"))
